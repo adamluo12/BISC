@@ -1,1 +1,1 @@
-# BISC-Transcriptional-Bursting-Inference-using-Single-Cell-data
+# BISC:Transcriptional-Bursting-Inference-using-Single-Cell-data
