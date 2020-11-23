@@ -47,7 +47,7 @@ formula <- gam(disps~s(logcpm),data=data_gam)
 
 ```
 (5) Caliberated BCV estimates
-``r
+```r
 bcv=matrix(rep(1,ncol(count)*nrow(count)),ncol=ncol(count))
 for (c in 1:ncol(count)) {
   bcv[,c] <- predict(formula,edgeR::cpm(count,log=T,prior.counts=1)[,c])
