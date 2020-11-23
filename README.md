@@ -45,6 +45,22 @@ logcpm=edgeR::aveLogCPM(count)
 ```
 (5) Caliberated BCV estimates
 
+(6) Running rstan
+### Bursting 
+```r
+fit=stan(file="bhm.stan",data=list(N=N,K=K,y=count,l=as.numeric(lib.size)),chains=1,iter =5000,control = list(adapt_delta = 0.99),  pars=c("kon","koff","s"),save_warmup=FALSE)
+```
+### Bursting + BCV
+```r
+fit1=stan(file="bhm1.stan",data=list(N=N,K=K,y=count,l=as.numeric(lib.size),bcv=bcv),chains=1,iter =5000,control = list(adapt_delta = 0.99),  pars=c("kon","koff","s"),save_warmup=FALSE)
+```
+### Bursting + BCV + Dropout
+```r
+fit2=stan(file="bhm2.stan",data=list(N=N,K=K,y=count,l=as.numeric(lib.size),bcv,tau=drop.tau,x0=drop.x0),chains=1,iter =5000,control = list(adapt_delta = 0.99),  pars=c("kon","koff","p","s"),save_warmup=FALSE)
+```
+
+
+
 
 
 
