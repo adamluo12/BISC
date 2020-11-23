@@ -39,9 +39,10 @@ drop.x0=getParam(splat,"dropout.mid")
 drop.tau=getParam(splat,"dropout.shape")
 ```
 (4) Estimate log2CPM and raw dispersion, and fit the mean-variance trend
+```r
 disps <- edgeR::estimateDisp(count)
 logcpm=edgeR::aveLogCPM(count)
-
+```
 (5) Caliberated BCV estimates
 
 
