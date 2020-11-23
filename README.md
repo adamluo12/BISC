@@ -9,7 +9,7 @@ Here, we develop a Bayesian hierarchical framework, BISC, to study the stochasti
 ## Required Packages
 ```r
 library(rstan)
-library(openxlsx)
+library(mgcv)
 library(edgeR)
 library(splatter)
 ```
@@ -42,9 +42,22 @@ drop.tau=getParam(splat,"dropout.shape")
 ```r
 disps <- edgeR::estimateDisp(count)
 logcpm=edgeR::aveLogCPM(count)
+data_gam=data.frame(logcpm,disps)
+formula <- gam(disps~s(logcpm),data=data_gam)
+
 ```
 (5) Caliberated BCV estimates
-
+``r
+bcv=matrix(rep(1,ncol(count)*nrow(count)),ncol=ncol(count))
+for (c in 1:ncol(count)) {
+  bcv[,c] <- predict(formula,edgeR::cpm(count,log=T,prior.counts=1)[,c])
+}
+if(bcv.df==Inf){
+  bcv=bcv
+}else{
+  bcv <- bcv*sqrt(bcv.df / rchisq(dim(count)[1], df = bcv.df))
+}
+```
 (6) Running rstan
 ### Bursting 
 ```r
