@@ -15,62 +15,63 @@ library(splatter)
 ```
 
 ## Running BISC
-BISC can take gene expression read count data, to minimize unwanted heterogeneity, we recommended data generated from cells of the same population. BISC has three mdoelling options, 1) Poisson-Beta model (Bursting); 2) Poisson-Beta model with modification to enforce a mean-variance trend (Bursting + BCV); 3) Poisson-Beta model with modifications to enforce a mean-variance trend and include dropout events (Bursting+BCV+Dropout). 
+BISC can take gene expression read count data, to minimize unwanted heterogeneity, we recommended data generated from cells of the same population. BISC has three mdoelling options, 1) Poisson-Beta model (PB); 2) Poisson-Beta model with modification to enforce a mean-variance trend (PB-trend); 3) Poisson-Beta model with modifications to enforce a mean-variance trend and include dropout events (ZIPB-trend). 
+
+## Install BISC
+```r
+install_github("adamluo12/BISC/BISC")
+```
+## Running BISC
+BISC takes the read count input values.
 
 ## Examples
 (1) Load read count data
 ```r
-load("read_count.RData")
-```
-(2) Estimate library size factor
-```r
-sum=colSums(count)
-count=count[,sum!=0]
-lib.size<-colSums(count)
-lib.size=lib.size/mean(lib.size)
+> count[1:10,1:5]
+    NA19098.r3.D02 NA19101.r1.C10 NA19101.r3.B02 NA19239.r3.B02 NA19098.r2.G06
+G1               1              0              0              0              0
+G2               0              0              0              0              0
+G3               1              0              4              3              0
+G4               0              1              0              0              0
+G5               0              0              0              0              0
+G6               0              0              0              0              0
+G7               0              0              0              0              0
+G8               2              3              0              0              2
+G9               4              4              2              3              4
+G10              0              0              0              0              0
 N=dim(count)[1]
 K=dim(count)[2]
 ```
-(3) Estimate Dropout probability related parameters
+(2) BISC estimation with 3 models
+### PB model
 ```r
-splat=splatEstimate(count)
-bcv.df=getParam(splat,"bcv.df")
-drop.x0=getParam(splat,"dropout.mid")
-drop.tau=getParam(splat,"dropout.shape")
+result=BISC_estimate(data=count,model="PB",iter=4000)
 ```
-(4) Estimate log2CPM and raw dispersion, and fit the mean-variance trend
+### PB-trend model
 ```r
-disps <- edgeR::estimateDisp(count)
-logcpm=edgeR::aveLogCPM(count)
-data_gam=data.frame(logcpm,disps)
-formula <- gam(disps~s(logcpm),data=data_gam)
+result=BISC_estimate(data=count,model="PB-trend",iter=4000)
+```
+### ZIPB-trend model
+```r
+result=BISC_estimate(data=count,model="ZIPB-trend",iter=4000)
+```
+(3) BISC output: we used the mean values of the posterior estimates of kon, koff and s.
+```r
+final=apply(result,2,mean)
+kon_est=final[1:N]
+> kon_est[1:10]
+  kon[1]   kon[2]   kon[3]   kon[4]   kon[5]   kon[6]   kon[7]   kon[8]   kon[9]  kon[10] 
+1.326592 2.376357 1.876852 1.688580 2.454198 3.058243 1.896000 3.509753 1.847244 2.269638 
+koff_est=final[N+1:2*N]
+> koff_est[1:10]
+ koff[1]  koff[2]  koff[3]  koff[4]  koff[5]  koff[6]  koff[7]  koff[8]  koff[9] koff[10] 
+2.959785 4.043145 3.044111 3.532146 2.557586 3.190786 4.101236 2.378761 2.911859 2.846453 
+s_est=final[(2*N+1):3*N]
+> s_est[1:10]
+    s[1]     s[2]     s[3]     s[4]     s[5]     s[6]     s[7]     s[8]     s[9]    s[10] 
+39.46621 34.29013 36.84154 41.46866 36.94047 36.57172 38.43477 38.48573 37.84727 39.22281 
+```
 
-```
-(5) Caliberated BCV estimates
-```r
-bcv=matrix(rep(1,ncol(count)*nrow(count)),ncol=ncol(count))
-for (c in 1:ncol(count)) {
-  bcv[,c] <- predict(formula,edgeR::cpm(count,log=T,prior.counts=1)[,c])
-}
-if(bcv.df==Inf){
-  bcv=bcv
-}else{
-  bcv <- bcv*sqrt(bcv.df / rchisq(dim(count)[1], df = bcv.df))
-}
-```
-(6) Running rstan
-### Bursting 
-```r
-fit=stan(file="bhm.stan",data=list(N=N,K=K,y=count,l=as.numeric(lib.size)),chains=1,iter =5000,control = list(adapt_delta = 0.99),  pars=c("kon","koff","s"),save_warmup=FALSE)
-```
-### Bursting + BCV
-```r
-fit1=stan(file="bhm1.stan",data=list(N=N,K=K,y=count,l=as.numeric(lib.size),bcv=bcv),chains=1,iter =5000,control = list(adapt_delta = 0.99),  pars=c("kon","koff","s"),save_warmup=FALSE)
-```
-### Bursting + BCV + Dropout
-```r
-fit2=stan(file="bhm2.stan",data=list(N=N,K=K,y=count,l=as.numeric(lib.size),bcv,tau=drop.tau,x0=drop.x0),chains=1,iter =5000,control = list(adapt_delta = 0.99),  pars=c("kon","koff","p","s"),save_warmup=FALSE)
-```
 
 
 
