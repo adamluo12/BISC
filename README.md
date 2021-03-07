@@ -71,6 +71,16 @@ s_est=final[(2*N+1):3*N]
     s[1]     s[2]     s[3]     s[4]     s[5]     s[6]     s[7]     s[8]     s[9]    s[10] 
 39.46621 34.29013 36.84154 41.46866 36.94047 36.57172 38.43477 38.48573 37.84727 39.22281 
 ```
+### Differential Bursting analysis 
+To compare bursting kinetics between two studying groups A and B for each gene, BISC formulates a statistical testing framework based on the posterior MCMC samples of bursting parameters (BISC estimation step above).
+```r
+DB_result=DB(data1=BISC_A,data2=BISC_B,frequency=0,size=0,log2=T)
+```
+### HeatMap, MA plot and Volcano plot
+```r
+library(edgeR)
+DB_plot(file1,file2,file3,DBdata=DB_result,main="DB frequency Group A vs. B")
+```
 
 
 
