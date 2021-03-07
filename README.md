@@ -69,6 +69,10 @@ result=BISC_estimate(data=count,model="ZIPB-trend",iter=4000)
 ### Differential Bursting analysis 
 To compare bursting kinetics between two studying groups A and B for each gene, BISC formulates a statistical testing framework based on the posterior MCMC samples of bursting parameters (BISC estimation step above).
 ```r
+result_A=BISC_estimate(data=count1,model="ZIPB-trend",iter=4000)
+result_B=BISC_estimate(data=count2,model="ZIPB-trend",iter=4000)
+BISC_A=result_A$MCMC
+BISC_B=result_B$MCMC
 DB_result=DB(data1=BISC_A,data2=BISC_B,frequency=0,size=0,log2=T)
 ```
 ### HeatMap, MA plot and Volcano plot
