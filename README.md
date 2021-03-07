@@ -98,13 +98,20 @@ Output
 5        0.0375        0.9625  11.659518
 6        0.0000        1.0000 235.586258
 ```
-### HeatMap, MA plot and Volcano plot
+### MA plot and Volcano plot
 ```r
+## MA plot
 library(edgeR)
-DB_plot(file1,file2,file3,DBdata=DB_result,main="DB frequency Group A vs. B")
+> pdf(file = "D:\\Desktop\\xizhi\\MA_plot_DB frequency Group A vs. B.pdf")
+> plotSmear(test1,de.tags = genetags,main="DB frequency Group A vs. B")
+> dev.off()
 ```
-
-
+![MA plot](Dragster.jpg)
+```r
+## Volcano plot
+> volcano_plot("volcano_plot_DB frequency Group A vs. B.pdf",comparison = test1,name = "DB frequency Group A vs. B")
+> dev.off()
+```
 
 
 
