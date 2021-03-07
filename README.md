@@ -57,19 +57,14 @@ result=BISC_estimate(data=count,model="ZIPB-trend",iter=4000)
 ```
 (3) BISC output: we used the mean values of the posterior estimates of kon, koff and s.
 ```r
-final=apply(result,2,mean)
-kon_est=final[1:N]
-> kon_est[1:10]
-  kon[1]   kon[2]   kon[3]   kon[4]   kon[5]   kon[6]   kon[7]   kon[8]   kon[9]  kon[10] 
-1.326592 2.376357 1.876852 1.688580 2.454198 3.058243 1.896000 3.509753 1.847244 2.269638 
-koff_est=final[N+1:2*N]
-> koff_est[1:10]
- koff[1]  koff[2]  koff[3]  koff[4]  koff[5]  koff[6]  koff[7]  koff[8]  koff[9] koff[10] 
-2.959785 4.043145 3.044111 3.532146 2.557586 3.190786 4.101236 2.378761 2.911859 2.846453 
-s_est=final[(2*N+1):3*N]
-> s_est[1:10]
-    s[1]     s[2]     s[3]     s[4]     s[5]     s[6]     s[7]     s[8]     s[9]    s[10] 
-39.46621 34.29013 36.84154 41.46866 36.94047 36.57172 38.43477 38.48573 37.84727 39.22281 
+> head(result$estimation)
+                 kon      koff         s
+497097     0.2307866 9.9571430  26.97822
+100503874  0.3697122 7.3681137  29.02944
+27395     10.2944072 0.6382955 136.37340
+18777      5.3132126 0.7275256  70.43799
+100503730  3.2760650 3.4720868  34.19306
+21399      8.8183328 0.5963465 124.00206
 ```
 ### Differential Bursting analysis 
 To compare bursting kinetics between two studying groups A and B for each gene, BISC formulates a statistical testing framework based on the posterior MCMC samples of bursting parameters (BISC estimation step above).
